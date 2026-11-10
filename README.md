@@ -32,6 +32,9 @@
 - squash merge만 허용, 머지 후 브랜치 자동 삭제
 - 자세한 규칙은 [CONTRIBUTING.md](./CONTRIBUTING.md) 참고
 
+## 워크플로
+`.github/workflows/`는 비워뒀습니다. 필요한 워크플로는 @dooooing이 필요할 때 직접 추가합니다.
+
 ## 연결 방식
 - **mnm-data → mnm-dev**: DB 구조 변경은 `migrations/`에서만 합니다. mnm-dev(`services/api`)는 이 마이그레이션을 적용해서 사용하며, 직접 스키마를 바꾸지 않습니다. `migrations/` 변경 PR은 @dooooing을 리뷰어로 지정합니다.
 - **mnm-data → mnm-ai**: `knowledge-base/`의 SOP·법령 원문은 `agents/guide_rag`(mnm-ai) 등에서 참조만 합니다. 원문 추가·수정은 이 레포에서만 합니다.
