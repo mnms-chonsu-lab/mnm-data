@@ -12,6 +12,8 @@ venv/
 
 # 원본 데이터 / 대용량 파일 (S3 사용, git에 넣지 않음)
 *.csv
+# 예외: 지식베이스 원문 조항 CSV (공식 원문 발췌, 소용량, 검수 이력 추적 필요)
+!knowledge-base/**/*.csv
 *.parquet
 *.xlsx
 /raw/
