@@ -4,8 +4,9 @@
 - DB: DATABASE_URL (없으면 DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD)
 - 원본 저장(선택): S3_ENDPOINT_URL, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, S3_BUCKET_NAME
   (없으면 원본 저장만 건너뜀. 적재는 계속)
-- 실패 알림(선택): ALERT_WEBHOOK_URL, ALERT_WEBHOOK_FORMAT(discord|slack, 기본 discord)
-  (비어 있으면 화면 출력만)
+- 실패 알림(선택): ALERT_WEBHOOK_URL, ALERT_WEBHOOK_FORMAT(discord|slack, 기본 discord),
+  MONITOR_ENV_NAME(알림 앞머리, 기본 staging) — mnm-dev #38 monitor.py 와 같은 값
+  (웹훅이 비어 있으면 화면 출력만)
 """
 import json
 import os
@@ -149,7 +150,8 @@ def run_job(job: str, work):
                 traceback.print_exc()
             log.execute("UPDATE etl_job_run SET finished_at = now(), status = 'failed', error = %s "
                         "WHERE etl_job_run_id = %s", (msg[:1000], run_id))
-            send_alert(f"🚨 수집 작업 실패: {job} — {msg[:300]} (직전 데이터 유지)")
+            env = os.environ.get("MONITOR_ENV_NAME", "staging")   # monitor.py 와 같은 앞머리 [staging]
+            send_alert(f"[{env}] 🚨 수집 작업 실패: {job} — {msg[:300]} (직전 데이터 유지)")
             print("실패:", msg)
             sys.exit(1)
         log.execute("UPDATE etl_job_run SET finished_at = now(), status = 'success', rows = %s "
