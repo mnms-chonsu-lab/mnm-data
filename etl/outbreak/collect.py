@@ -3,8 +3,7 @@
 출처: 농림축산식품 공공데이터포털 「가축질병발생정보」 오픈 API
       (TI_QIA_LVSTCK_DISOCNC_INFO, Grid_20151204000000000316_1, 제공 농림축산검역본부)
 실행: python etl/outbreak/collect.py
-- 전체 행을 받아 축종이 "소-"로 시작하는 행만 적재 (11/15 적재와 같은 기준: 한우·젖소·육우 등)
-  명세 DATA-02 "소(한우) 데이터만 선별"이 한우만인지 PM 확인 중. 한우만이면 LIVESTOCK_PREFIX 를 "소-한우"로
+- 전체 행을 받아 축종(LVSTCKSPC_NM)이 "소-한우"인 행만 적재 (명세 DATA-02 "소(한우) 데이터만")
 - 같은 발생 번호(ICTSD_OCCRRNC_NO)가 있으면 덮어씀
 - 하나라도 실패하면 전체 취소 → 직전 데이터 유지, etl_job_run failed + 웹훅 알림
 - 농장명(FARM_NM)은 개인정보가 섞여 있어 DB·원본 저장 모두 넣지 않음
@@ -21,7 +20,7 @@ from common import load_official, load_region_index, mafra_fetch_all, match_name
 
 JOB = "outbreak"
 GRID = "Grid_20151204000000000316_1"
-LIVESTOCK_PREFIX = "소-"   # 적재할 축종 (LVSTCKSPC_NM 앞부분)
+LIVESTOCK = "소-한우"   # 적재할 축종 (LVSTCKSPC_NM 값)
 
 
 def to_date(v):
@@ -46,8 +45,8 @@ def work(conn):
     upload_raw(json.dumps(pages, ensure_ascii=False).encode("utf-8"), "outbreak_info",
                f"{GRID}_{datetime.now():%H%M%S}.json")
 
-    target = [r for r in rows if (s(r.get("LVSTCKSPC_NM")) or "").startswith(LIVESTOCK_PREFIX)]
-    print(f"적재 대상 ({LIVESTOCK_PREFIX}*):", len(target), "건")
+    target = [r for r in rows if s(r.get("LVSTCKSPC_NM")) == LIVESTOCK]
+    print(f"적재 대상 ({LIVESTOCK}):", len(target), "건")
 
     by_name, codes = load_region_index(conn)
     off_code, off_name = load_official()
