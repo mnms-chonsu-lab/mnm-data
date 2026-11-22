@@ -74,6 +74,11 @@ cp .env.example .env      # DATABASE_URL, PUBLIC_DATA_API_KEY 등 채우기
 | `AWS_SECRET_ACCESS_KEY` | `etl/*` | S3 접근 | 위와 같음 |
 | `AWS_REGION` | `etl/*` | AWS 리전 | 위와 같음 |
 | `S3_BUCKET_NAME` | `etl/*` | 원본 데이터 버킷 | 위와 같음 |
+| `S3_ENDPOINT_URL` | `etl/*` | Object Storage(S3 호환) 주소 | 원본 저장만 건너뜀 |
+| `MAFRA_API_KEY` | `etl/outbreak`, `etl/disinfection_facility` | 농림축산식품 공공데이터포털 인증키 | 질병 발생·거점소독시설 수집 실패 |
+| `ALERT_WEBHOOK_URL` | `etl/*` | 수집 실패 알림 웹훅 (mnm-dev `monitor`와 같은 값) | 로그만 남김 |
+| `ALERT_WEBHOOK_FORMAT` | `etl/*` | `discord`(기본) / `slack` | `discord`로 보냄 |
+| `MONITOR_ENV_NAME` | `etl/*` | 알림 앞머리 (mnm-dev `monitor`와 같은 값) | `staging` |
 
 ---
 
@@ -190,9 +195,9 @@ mnm-data/
 
 | 데이터 | 출처 | 이 서비스에서의 용도 | 이용 조건 |
 | --- | --- | --- | --- |
-| 가축 질병 발생 정보 | 민관협력 지원 플랫폼 공공데이터 | 발생 현황 참고 | 제공처 이용 조건 확인 필요 |
-| 사육규모별 농장 통계 | 민관협력 지원 플랫폼 공공데이터 | 농가 규모 정보 | 제공처 이용 조건 확인 필요 |
-| 거점소독시설 | 민관협력 지원 플랫폼 공공데이터 | 소독 시설 안내 | 제공처 이용 조건 확인 필요 |
+| 가축 질병 발생 정보 | 농림축산식품 공공데이터포털 「가축질병발생정보」 오픈 API (농림축산검역본부) | 발생 현황 참고 | 저작권표시 + 동일조건변경허락 (포털 표기) |
+| 한우 사육규모 현황 | 공공데이터포털 15147310 「가축위생방역지원본부_전국 시군별 한우 사육규모 현황」 오픈 API | 농가 규모 정보 | 공공저작물 출처표시 (제1유형) |
+| 거점소독시설 | 농림축산식품 공공데이터포털 「거점소독시설안내」 오픈 API (농림축산식품부) | 소독 시설 안내 | 포털에 이용허락범위 표기 없음 (확인 필요) |
 | 구제역·럼피스킨 SOP, 가축전염병 예방법 | 공식 지침·법령 | 안내 문구 원문 | 공문서·법령 원문 (출처 표기) |
 | 한우 행동 데이터 | AI-Hub | 소 행동 인식 모델(YOLO11s) 학습·평가 | **AI-Hub 이용약관 준수** — 원본 재배포 금지, git 커밋 금지 |
 | 부위 판정 이미지 | FMD Cattle, Cattle side/back view | 부위 일치 검증 모델(SigLIP 2) 학습·평가 | FMD Cattle: **CC BY 4.0** (출처 표기). Cattle side/back view: 🚧 라이선스 확인 중 |
