@@ -4,7 +4,7 @@
 
 | 작업 (`etl_job_run.job`) | 실행 | 주기 (명세) | 출처 | 적재 방식 |
 | --- | --- | --- | --- | --- |
-| `outbreak` | `python etl/outbreak/collect.py` | 일 1회 | 농림축산식품 공공데이터포털 「가축질병발생정보」 `Grid_20151204000000000316_1` | 축종 `소-한우` 행만 (명세 DATA-02), 발생 번호 기준 덮어쓰기 |
+| `outbreak` | `python etl/outbreak/collect.py` | 일 1회 | 농림축산식품 공공데이터포털 「가축질병발생정보」 `Grid_20151204000000000316_1` | 축종 `소-`로 시작하는 행(소 전체), 발생 번호 기준 덮어쓰기 |
 | `disinfection_facility` | `python etl/disinfection_facility/collect.py` | 일 1회 | 같은 포털 「거점소독시설안내」 `Grid_20220621000000000618_1` | 전체 지우고 다시 넣기 |
 | `farm_scale` | `python etl/farm_scale/collect.py` | 월 1회 | 공공데이터포털 15147310 (원본 갱신 연 1회) | `build_farm_scale_sql.py` 가 만든 SQL 실행 |
 
