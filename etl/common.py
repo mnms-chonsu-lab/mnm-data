@@ -125,7 +125,7 @@ def send_alert(text: str):
     key = "text" if os.environ.get("ALERT_WEBHOOK_FORMAT", "discord") == "slack" else "content"
     try:
         req = urllib.request.Request(url, data=json.dumps({key: text}).encode(),
-                                     headers={"Content-Type": "application/json"}, method="POST")
+                                     headers={"Content-Type": "application/json", "User-Agent": "mnm-etl/1.0"}, method="POST")
         urllib.request.urlopen(req, timeout=10).close()
     except Exception as e:  # noqa: BLE001 — 알림 실패로 기록이 멈추면 안 됨
         print(f"웹훅 전송 실패 ({type(e).__name__})", flush=True)
