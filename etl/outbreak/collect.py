@@ -1,0 +1,105 @@
+"""가축 질병 발생 정보 수집 → DB outbreak_info (일 1회).
+
+출처: 농림축산식품 공공데이터포털 「가축질병발생정보」 오픈 API
+      (TI_QIA_LVSTCK_DISOCNC_INFO, Grid_20151204000000000316_1, 제공 농림축산검역본부)
+실행: python etl/outbreak/collect.py
+- 전체 행을 받아 축종(LVSTCKSPC_NM)이 "소-"로 시작하는 행(소 전체: 한우·육우·젖소 등)만 적재 (PM 결정 PR #8)
+- 발생일(OCCRRNC_DE)이 FROM_DATE 이후인 행만 적재하고, 그 전 행은 DB에서 지움
+- 같은 발생 번호(ICTSD_OCCRRNC_NO)가 있으면 덮어씀
+- 하나라도 실패하면 전체 취소 → 직전 데이터 유지, etl_job_run failed + 웹훅 알림
+- 농장명(FARM_NM)은 개인정보가 섞여 있어 DB·원본 저장 모두 넣지 않음
+- 법정동 코드: ① 현재 코드표에 있으면 그대로 ② 공식 변경표(옛 코드 → 새 코드) ③ 농장 소재지 이름으로 찾음
+"""
+import json
+import os
+import sys
+from collections import Counter
+from datetime import date, datetime
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from common import load_official, load_region_index, mafra_fetch_all, match_name, run_job, upload_raw  # noqa: E402
+
+JOB = "outbreak"
+GRID = "Grid_20151204000000000316_1"
+LIVESTOCK_PREFIX = "소-"   # 적재할 축종: 이 글자로 시작하는 LVSTCKSPC_NM 값 (소 전체)
+FROM_DATE = date(2023, 1, 1)   # 이 날짜부터 적재 (서비스는 최근 발생만 씀)
+
+
+def to_date(v):
+    v = str(v or "").strip()
+    return datetime.strptime(v, "%Y%m%d").date() if v else None
+
+
+def s(v):
+    v = str(v if v is not None else "").strip()
+    return v or None
+
+
+def work(conn):
+    rows, pages = mafra_fetch_all(GRID)
+    print("API 전체:", len(rows), "건")
+    species = Counter(s(r.get("LVSTCKSPC_NM")) for r in rows)
+    print("축종별 건수 (상위 10):", species.most_common(10))
+
+    for p in pages:
+        for r in p.get("row") or []:
+            r.pop("FARM_NM", None)
+    upload_raw(json.dumps(pages, ensure_ascii=False).encode("utf-8"), "outbreak_info",
+               f"{GRID}_{datetime.now():%H%M%S}.json")
+
+    target = [r for r in rows if (s(r.get("LVSTCKSPC_NM")) or "").startswith(LIVESTOCK_PREFIX)
+              and (to_date(r.get("OCCRRNC_DE")) or date.min) >= FROM_DATE]
+    print(f"적재 대상 ({LIVESTOCK_PREFIX}*, {FROM_DATE} 이후):", len(target), "건", dict(Counter(s(r.get("LVSTCKSPC_NM")) for r in target)))
+
+    by_name, codes = load_region_index(conn)
+    off_code, off_name = load_official()
+    print("공식 변경표:", len(off_code), "건" if off_code else "건 (official_map.csv 없음 → ②단계 건너뜀)")
+
+    out, stat, unmatched = [], Counter(), 0
+    for r in target:
+        orig = s(r.get("FARM_LOCPLC_LEGALDONG_CODE")) or ""
+        if orig in codes:
+            code = orig
+            stat["원래 코드 그대로"] += 1
+        elif off_code.get(orig) in codes:
+            code = off_code[orig]
+            stat["공식 변경표"] += 1
+        else:
+            code, _, _, basis = match_name(r.get("FARM_LOCPLC") or "", by_name, off_name)
+            stat["이름으로 찾음: " + basis] += 1
+            unmatched += 0 if code else 1
+        cnt = r.get("OCCRRNC_LVSTCKCNT")
+        out.append((
+            s(r.get("ICTSD_OCCRRNC_NO")),
+            s(r.get("LKNTS_NM")),
+            s(r.get("FARM_LOCPLC")),
+            code,
+            to_date(r.get("OCCRRNC_DE")),
+            s(r.get("LVSTCKSPC_NM")),
+            int(cnt) if str(cnt or "").strip() else None,
+            s(r.get("DGNSS_ENGN_NM")),
+            to_date(r.get("CESSATION_DE")),
+        ))
+    print("법정동 코드 매핑:", dict(stat), "/ 실패", unmatched, "건")
+
+    with conn.cursor() as cur:
+        cur.executemany(
+            """INSERT INTO outbreak_info
+               (ictsd_occrrnc_no, lknts_nm, farm_locplc, region_code, occrrnc_de,
+                lvstckspc_nm, occrrnc_lvstckcnt, dgnss_engn_nm, cessation_de, collected_at)
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, now())
+               ON CONFLICT (ictsd_occrrnc_no) DO UPDATE SET
+                 lknts_nm = EXCLUDED.lknts_nm, farm_locplc = EXCLUDED.farm_locplc,
+                 region_code = EXCLUDED.region_code, occrrnc_de = EXCLUDED.occrrnc_de,
+                 lvstckspc_nm = EXCLUDED.lvstckspc_nm, occrrnc_lvstckcnt = EXCLUDED.occrrnc_lvstckcnt,
+                 dgnss_engn_nm = EXCLUDED.dgnss_engn_nm, cessation_de = EXCLUDED.cessation_de,
+                 collected_at = EXCLUDED.collected_at""",
+            out,
+        )
+        cur.execute("DELETE FROM outbreak_info WHERE occrrnc_de < %s", (FROM_DATE,))
+        print(f"{FROM_DATE} 이전 행 삭제:", cur.rowcount, "건")
+    return len(out)
+
+
+if __name__ == "__main__":
+    run_job(JOB, work)

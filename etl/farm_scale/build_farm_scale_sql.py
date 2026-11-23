@@ -4,7 +4,7 @@
 사용법:
     python etl/farm_scale/build_farm_scale_sql.py --api [출력 SQL 경로]      # OpenAPI (기본)
     python etl/farm_scale/build_farm_scale_sql.py "CSV 경로" [출력 SQL 경로]  # 파일 (예비)
-    옵션 --years 2025,2026 : 넣을 연도 (기본: 데이터의 최신 2개 연도)
+    옵션 --years 2025,2026 : 넣을 연도 (기본: FROM_YEAR 이후 전체 연도)
 
 - API: Base URL api.odcloud.kr/api, 경로는 Swagger(infuser.odcloud.kr)에서 실행 시 찾음
 - 인증키: .env 의 PUBLIC_DATA_API_KEY (없으면 DATA_GO_KR_KEY)
@@ -112,8 +112,9 @@ for c in df.columns:
     if c not in ("breed", "province", "city_county"):
         df[c] = pd.to_numeric(df[c]).astype(int)   # API가 문자열로 줘도 숫자로
 
+FROM_YEAR = 2023   # 이 연도부터 적재 (서비스는 최근 발생·최신 통계만 씀)
 if want_years is None:
-    want_years = sorted(df["year"].unique())[-2:]      # 최신 2개 연도
+    want_years = sorted(y for y in df["year"].unique() if y >= FROM_YEAR)
 df = df[df["year"].isin(want_years)]
 if df.empty:
     sys.exit(f"{want_years} 연도 데이터 없음")
