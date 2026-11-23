@@ -4,6 +4,7 @@
       (TI_QIA_LVSTCK_DISOCNC_INFO, Grid_20151204000000000316_1, 제공 농림축산검역본부)
 실행: python etl/outbreak/collect.py
 - 전체 행을 받아 축종(LVSTCKSPC_NM)이 "소-"로 시작하는 행(소 전체: 한우·육우·젖소 등)만 적재 (PM 결정 PR #8)
+- 발생일(OCCRRNC_DE)이 FROM_DATE 이후인 행만 적재하고, 그 전 행은 DB에서 지움
 - 같은 발생 번호(ICTSD_OCCRRNC_NO)가 있으면 덮어씀
 - 하나라도 실패하면 전체 취소 → 직전 데이터 유지, etl_job_run failed + 웹훅 알림
 - 농장명(FARM_NM)은 개인정보가 섞여 있어 DB·원본 저장 모두 넣지 않음
@@ -13,7 +14,7 @@ import json
 import os
 import sys
 from collections import Counter
-from datetime import datetime
+from datetime import date, datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from common import load_official, load_region_index, mafra_fetch_all, match_name, run_job, upload_raw  # noqa: E402
@@ -21,6 +22,7 @@ from common import load_official, load_region_index, mafra_fetch_all, match_name
 JOB = "outbreak"
 GRID = "Grid_20151204000000000316_1"
 LIVESTOCK_PREFIX = "소-"   # 적재할 축종: 이 글자로 시작하는 LVSTCKSPC_NM 값 (소 전체)
+FROM_DATE = date(2023, 1, 1)   # 이 날짜부터 적재 (서비스는 최근 발생만 씀)
 
 
 def to_date(v):
@@ -45,8 +47,9 @@ def work(conn):
     upload_raw(json.dumps(pages, ensure_ascii=False).encode("utf-8"), "outbreak_info",
                f"{GRID}_{datetime.now():%H%M%S}.json")
 
-    target = [r for r in rows if (s(r.get("LVSTCKSPC_NM")) or "").startswith(LIVESTOCK_PREFIX)]
-    print(f"적재 대상 ({LIVESTOCK_PREFIX}*):", len(target), "건", dict(Counter(s(r.get("LVSTCKSPC_NM")) for r in target)))
+    target = [r for r in rows if (s(r.get("LVSTCKSPC_NM")) or "").startswith(LIVESTOCK_PREFIX)
+              and (to_date(r.get("OCCRRNC_DE")) or date.min) >= FROM_DATE]
+    print(f"적재 대상 ({LIVESTOCK_PREFIX}*, {FROM_DATE} 이후):", len(target), "건", dict(Counter(s(r.get("LVSTCKSPC_NM")) for r in target)))
 
     by_name, codes = load_region_index(conn)
     off_code, off_name = load_official()
@@ -93,6 +96,8 @@ def work(conn):
                  collected_at = EXCLUDED.collected_at""",
             out,
         )
+        cur.execute("DELETE FROM outbreak_info WHERE occrrnc_de < %s", (FROM_DATE,))
+        print(f"{FROM_DATE} 이전 행 삭제:", cur.rowcount, "건")
     return len(out)
 
 

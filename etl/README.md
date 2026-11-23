@@ -4,9 +4,9 @@
 
 | 작업 (`etl_job_run.job`) | 실행 | 주기 (명세) | 출처 | 적재 방식 |
 | --- | --- | --- | --- | --- |
-| `outbreak` | `python etl/outbreak/collect.py` | 일 1회 | 농림축산식품 공공데이터포털 「가축질병발생정보」 `Grid_20151204000000000316_1` | 축종 `소-`로 시작하는 행(소 전체), 발생 번호 기준 덮어쓰기 |
+| `outbreak` | `python etl/outbreak/collect.py` | 일 1회 | 농림축산식품 공공데이터포털 「가축질병발생정보」 `Grid_20151204000000000316_1` | 축종 `소-`로 시작하는 행(소 전체), 발생일 2023-01-01 이후, 발생 번호 기준 덮어쓰기 (그 전 행은 삭제) |
 | `disinfection_facility` | `python etl/disinfection_facility/collect.py` | 일 1회 | 같은 포털 「거점소독시설안내」 `Grid_20220621000000000618_1` | 전체 지우고 다시 넣기 |
-| `farm_scale` | `python etl/farm_scale/collect.py` | 월 1회 | 공공데이터포털 15147310 (원본 갱신 연 1회) | `build_farm_scale_sql.py` 가 만든 SQL 실행 |
+| `farm_scale` | `python etl/farm_scale/collect.py` | 월 1회 | 공공데이터포털 15147310 (원본 갱신 연 1회) | `build_farm_scale_sql.py` 가 만든 SQL 실행 (2023년 이후 연도) |
 | (어드민 [지금 수집]) | `python etl/run_requested.py` | 5분마다 | `etl_job_run`의 `requested` 행 | 요청된 작업의 수집 스크립트 실행 |
 
 ## 동작
