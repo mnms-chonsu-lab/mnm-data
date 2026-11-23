@@ -7,9 +7,11 @@
 | `outbreak` | `python etl/outbreak/collect.py` | 일 1회 | 농림축산식품 공공데이터포털 「가축질병발생정보」 `Grid_20151204000000000316_1` | 축종 `소-`로 시작하는 행(소 전체), 발생 번호 기준 덮어쓰기 |
 | `disinfection_facility` | `python etl/disinfection_facility/collect.py` | 일 1회 | 같은 포털 「거점소독시설안내」 `Grid_20220621000000000618_1` | 전체 지우고 다시 넣기 |
 | `farm_scale` | `python etl/farm_scale/collect.py` | 월 1회 | 공공데이터포털 15147310 (원본 갱신 연 1회) | `build_farm_scale_sql.py` 가 만든 SQL 실행 |
+| (어드민 [지금 수집]) | `python etl/run_requested.py` | 5분마다 | `etl_job_run`의 `requested` 행 | 요청된 작업의 수집 스크립트 실행 |
 
 ## 동작
 - 실행마다 `etl_job_run`에 `running` → `success`(건수) / `failed`(원인) 기록. 어드민 대시보드가 이 표를 읽음.
+- 어드민 [지금 수집](ADM-09): 백엔드가 `status = 'requested'` 행을 넣으면 `run_requested.py`가 실행. 수집 스크립트는 그 행을 이어받아 `running` → `success`/`failed`로 바꿈 (요청이 없으면 새 행). 같은 작업이 `running`이면 다음 확인 때 실행.
 - 적재는 한 트랜잭션. 실패하면 전체 취소 → 직전 데이터 유지.
 - API가 0건이거나 받은 건수가 `totalCnt`와 다르면 실패로 봄 (일부만 받은 데이터로 덮어쓰지 않음).
 - 실패하면 `ALERT_WEBHOOK_URL`(mnm-dev #38 감시 프로그램과 같은 웹훅)로 알림, 종료 코드 1. 비어 있으면 화면 출력만.

@@ -134,11 +134,17 @@ def send_alert(text: str):
 def run_job(job: str, work):
     """etl_job_run 에 running → success/failed 기록. work(conn) 는 적재한 행 수를 반환.
 
+    어드민 [지금 수집]이 넣은 같은 작업의 requested 행이 있으면 그 행을 이어받고, 없으면 새 행을 만듦.
     work 는 하나의 트랜잭션 안에서 돌고, 실패하면 전체 취소 → 직전 데이터 유지.
     실패하면 웹훅 알림 + 종료 코드 1 (스케줄러가 실패를 알 수 있게).
     """
     with connect_db(autocommit=True) as log:
-        run_id = log.execute(
+        row = log.execute(
+            "UPDATE etl_job_run SET status = 'running', started_at = now() WHERE etl_job_run_id = ("
+            " SELECT etl_job_run_id FROM etl_job_run WHERE job = %s AND status = 'requested'"
+            " ORDER BY etl_job_run_id LIMIT 1 FOR UPDATE SKIP LOCKED) RETURNING etl_job_run_id",
+            (job,)).fetchone()
+        run_id = row[0] if row else log.execute(
             "INSERT INTO etl_job_run (job, started_at, status) VALUES (%s, now(), 'running') "
             "RETURNING etl_job_run_id", (job,)).fetchone()[0]
         try:
