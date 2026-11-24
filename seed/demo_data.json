@@ -1,0 +1,390 @@
+{
+    "cows": [
+        {
+            "sex": "암",
+            "barn": "1번 축사",
+            "breed": "한우",
+            "source": "trace",
+            "tag_full": "002123450871",
+            "tag_last4": "0871",
+            "birth_date": "2020-03-14",
+            "trace_checked_at": "2026-10-25T08:05:12.285257+00:00",
+            "vaccine_last_date": "2026-04-02",
+            "vaccine_last_order": 7
+        },
+        {
+            "sex": "암",
+            "barn": "2번 축사",
+            "breed": "한우",
+            "source": "trace",
+            "tag_full": "002123451234",
+            "tag_last4": "1234",
+            "birth_date": "2022-03-14",
+            "trace_checked_at": "2026-10-25T08:05:12.285257+00:00",
+            "vaccine_last_date": "2026-04-02",
+            "vaccine_last_order": 7
+        },
+        {
+            "sex": "수",
+            "barn": "3번 축사",
+            "breed": "한우",
+            "source": "trace",
+            "tag_full": "002123455520",
+            "tag_last4": "5520",
+            "birth_date": "2024-03-14",
+            "trace_checked_at": "2026-10-25T08:05:12.285257+00:00",
+            "vaccine_last_date": "2026-04-02",
+            "vaccine_last_order": 7
+        },
+        {
+            "sex": "암",
+            "barn": "2번 축사",
+            "breed": "한우",
+            "source": "manual",
+            "tag_full": "002123460871",
+            "tag_last4": "0871",
+            "birth_date": "2020-03-15",
+            "trace_checked_at": null,
+            "vaccine_last_date": null,
+            "vaccine_last_order": null
+        }
+    ],
+    "farm": {
+        "lat": 36.6013000,
+        "lng": 126.6608000,
+        "name": "김한우 농장",
+        "farm_no": "448012",
+        "head_count": 42,
+        "owner_name": "김한우",
+        "region_code": "4480025000"
+    },
+    "diary": [
+        {
+            "date": "2026-11-24",
+            "value": "2번 축사",
+            "category": "소독",
+            "cow_tag4": null,
+            "raw_text": "아침에 2번 축사 소독했고, 1234번이 사료를 좀 남겼어.",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-24",
+            "value": "사료 남김",
+            "category": "관찰",
+            "cow_tag4": "1234",
+            "raw_text": "아침에 2번 축사 소독했고, 1234번이 사료를 좀 남겼어.",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-24",
+            "value": "특이사항 없음",
+            "category": "관찰",
+            "cow_tag4": "5520",
+            "raw_text": "5520번은 괜찮아",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-23",
+            "value": "축사 소독",
+            "category": "소독",
+            "cow_tag4": null,
+            "raw_text": "축사 소독했어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-23",
+            "value": "사료 잘 먹음",
+            "category": "관찰",
+            "cow_tag4": "0871",
+            "raw_text": "2번 축사 0871번 사료 잘 먹었어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-22",
+            "value": "사료 차량 출입",
+            "category": "출입",
+            "cow_tag4": null,
+            "raw_text": "사료 차 들어왔어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-21",
+            "value": "사료 조금 남김",
+            "category": "관찰",
+            "cow_tag4": "1234",
+            "raw_text": "1234번이 사료를 남겼어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-20",
+            "value": "배가 많이 불러옴",
+            "category": "관찰",
+            "cow_tag4": "0871",
+            "raw_text": "0871번 배가 많이 불렀어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-20",
+            "value": "축사 소독",
+            "category": "소독",
+            "cow_tag4": null,
+            "raw_text": "축사 소독했어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-19",
+            "value": "사료 차량 출입",
+            "category": "출입",
+            "cow_tag4": null,
+            "raw_text": "사료 차 다녀갔어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-19",
+            "value": "사료 잘 먹음",
+            "category": "관찰",
+            "cow_tag4": "1234",
+            "raw_text": "1234번 사료 잘 먹었어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-18",
+            "value": "총 42두",
+            "category": "사육현황",
+            "cow_tag4": null,
+            "raw_text": "마흔두 마리 그대로야",
+            "head_count": 42,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-17",
+            "value": "축사 소독",
+            "category": "소독",
+            "cow_tag4": null,
+            "raw_text": "축사 소독했어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-17",
+            "value": "특이사항 없음",
+            "category": "관찰",
+            "cow_tag4": "0871",
+            "raw_text": "2번 축사 0871번은 별일 없어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-16",
+            "value": "특이사항 없음",
+            "category": "관찰",
+            "cow_tag4": "5520",
+            "raw_text": "5520번은 별일 없어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-15",
+            "value": "볏짚 들여옴",
+            "category": "메모",
+            "cow_tag4": null,
+            "raw_text": "볏짚 들여놨어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-14",
+            "value": "축사 소독",
+            "category": "소독",
+            "cow_tag4": null,
+            "raw_text": "축사 소독했어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-14",
+            "value": "백신",
+            "category": "접종",
+            "cow_tag4": "1234",
+            "raw_text": "1234번 구제역 주사 놨어",
+            "head_count": null,
+            "vaccine_type": "구제역"
+        },
+        {
+            "date": "2026-11-13",
+            "value": "사료 차량 출입",
+            "category": "출입",
+            "cow_tag4": null,
+            "raw_text": "사료 차 들어왔다 갔어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-12",
+            "value": "사료 잘 먹음",
+            "category": "관찰",
+            "cow_tag4": "0871",
+            "raw_text": "0871번 사료 잘 먹었어",
+            "head_count": null,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-11",
+            "value": "총 42두",
+            "category": "사육현황",
+            "cow_tag4": null,
+            "raw_text": "오늘 우리 소 마흔두 마리 다 있어",
+            "head_count": 42,
+            "vaccine_type": null
+        },
+        {
+            "date": "2026-11-11",
+            "value": "축사 소독",
+            "category": "소독",
+            "cow_tag4": null,
+            "raw_text": "축사 소독했어",
+            "head_count": null,
+            "vaccine_type": null
+        }
+    ],
+    "tasks": [
+        {
+            "kind": "birth_report",
+            "title": "송아지 출생 신고",
+            "due_date": "2026-11-30"
+        }
+    ],
+    "alerts": [
+        {
+            "body": "11월 21일과 11월 24일에 사료 남김을 기록했어요. 한 번 살펴봐 주세요.",
+            "kind": "diff",
+            "title": "1234번, 평소와 다른 모습이 보여요"
+        },
+        {
+            "body": null,
+            "kind": "deadline",
+            "title": "송아지 출생 신고 · 6일 남음"
+        }
+    ],
+    "_설명": "데모 시드(demo_data.sql)를 실행일 2026-11-24 기준으로 넣은 결과. 날짜는 실행일에 따라 바뀜",
+    "consents": [
+        {
+            "version": "v1",
+            "consent_type": "delivery"
+        },
+        {
+            "version": "v1",
+            "consent_type": "processing"
+        },
+        {
+            "version": "v1",
+            "consent_type": "privacy"
+        }
+    ],
+    "receiver_inbox": [
+        {
+            "kind": "symptom",
+            "route": "call",
+            "result": null,
+            "status": "new",
+            "answers": {
+                "feed": "yes",
+                "lump": "no",
+                "drool": "yes",
+                "blister": "no"
+            },
+            "farm_no": "448012",
+            "cow_tag4": "1234",
+            "due_date": null,
+            "farm_name": "김한우 농장",
+            "approved_at": "2026-11-24T00:42:00Z",
+            "history_type": null,
+            "matched_count": 2,
+            "history_fields": null
+        },
+        {
+            "kind": "symptom",
+            "route": "coop",
+            "result": null,
+            "status": "checking",
+            "answers": {
+                "feed": "yes",
+                "lump": "no",
+                "drool": "yes",
+                "blister": "no"
+            },
+            "farm_no": "499901",
+            "cow_tag4": "0871",
+            "due_date": null,
+            "farm_name": "송아지목장",
+            "approved_at": "2026-11-23T23:15:00Z",
+            "history_type": null,
+            "matched_count": 2,
+            "history_fields": null
+        },
+        {
+            "kind": "history",
+            "route": "coop",
+            "result": null,
+            "status": "new",
+            "answers": null,
+            "farm_no": "499905",
+            "cow_tag4": null,
+            "due_date": "2026-11-30",
+            "farm_name": "솔밭농장",
+            "approved_at": "2026-11-23T11:10:00Z",
+            "history_type": "출생",
+            "matched_count": null,
+            "history_fields": {
+                "sex": "암",
+                "breed": "한우",
+                "birth_date": "2026-11-23",
+                "mother_tag4": "0871"
+            }
+        },
+        {
+            "kind": "symptom",
+            "route": "web",
+            "result": "vet_guide",
+            "status": "done",
+            "answers": {
+                "feed": "yes",
+                "lump": "no",
+                "drool": "yes",
+                "blister": "no"
+            },
+            "farm_no": "499903",
+            "cow_tag4": "5520",
+            "due_date": null,
+            "farm_name": "들판한우",
+            "approved_at": "2026-11-23T08:20:00Z",
+            "history_type": null,
+            "matched_count": 2,
+            "history_fields": null
+        }
+    ],
+    "history_report_draft": {
+        "type": "출생",
+        "fields": {
+            "sex": "암",
+            "breed": "한우",
+            "birth_date": "2026-11-23",
+            "mother_tag4": "0871"
+        },
+        "status": "draft",
+        "missing": [
+        ],
+        "due_date": "2026-11-30"
+    }
+}
