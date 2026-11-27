@@ -202,8 +202,8 @@ INSERT INTO field_media (symptom_report_id, kind, requested_part, predicted_part
 SELECT s.symptom_report_id, 'photo', p.part, p.part, TRUE, p.path
 FROM deliveries d
 JOIN report_summary s ON s.report_summary_id = d.report_summary_id
-CROSS JOIN (VALUES ('head_mouth', 'demo/photo/mouth.jpg'),
-                   ('body_side_skin', 'demo/photo/side.jpg')) AS p(part, path)
+CROSS JOIN (VALUES ('mouth', 'demo/photo/mouth.jpg'),
+                   ('flank', 'demo/photo/side.jpg')) AS p(part, path)
 WHERE d.idempotency_key IN ('seed-demo-1', 'seed-demo-2', 'seed-demo-4')
   AND NOT EXISTS (SELECT 1 FROM field_media m
                   WHERE m.symptom_report_id = s.symptom_report_id AND m.file_path = p.path);
