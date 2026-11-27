@@ -106,7 +106,7 @@ WHERE f.farm_no = '448012'
 -- 6) 동의 기록 3건 (김한우 농장주). 종류는 농가 앱 등록 화면의 3가지. 코드·버전은 제안값
 INSERT INTO consents (users_id, consent_type, version, agreed_at)
 SELECT f.owner_user_id, v.consent_type, 'v1', now() - interval '30 days'
-FROM farm_info f, (VALUES ('privacy'), ('delivery'), ('processing')) AS v(consent_type)
+FROM farm_info f, (VALUES ('privacy'), ('delivery'), ('outsourcing')) AS v(consent_type)
 WHERE f.farm_no = '448012'
   AND NOT EXISTS (SELECT 1 FROM consents c WHERE c.users_id = f.owner_user_id AND c.consent_type = v.consent_type);
 
