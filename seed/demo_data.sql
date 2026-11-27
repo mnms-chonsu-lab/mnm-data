@@ -4,7 +4,7 @@
 -- 계정·농장·기관은 mnm-dev R__seed_demo_accounts.sql 이 먼저 넣는다. 이 파일은 그 뒤에 실행한다.
 -- 날짜는 실행일(CURRENT_DATE) 기준으로 넣는다. 시연일에도 "최근 14일 일지"가 채워져 보이게 하려는 것.
 -- 여러 번 실행해도 중복으로 들어가지 않는다. 등록 시연용 농가(499902·499904)에는 아무것도 넣지 않는다.
--- 사진·음성 파일(Object Storage demo/)은 이 파일에 넣지 않는다.
+-- 사진·음성 파일은 Object Storage demo/ 에 올리고, 이 파일은 그 경로만 연결한다 (8·9번).
 
 BEGIN;
 -- 날짜 기준을 한국 시각으로 고정 (이 실행 안에서만 적용, DB 설정은 안 바뀜)
@@ -103,7 +103,7 @@ FROM farm_info f JOIN tasks t ON t.farm_id = f.farm_id AND t.kind = 'birth_repor
 WHERE f.farm_no = '448012'
   AND NOT EXISTS (SELECT 1 FROM alerts a WHERE a.users_id = f.owner_user_id AND a.kind = 'deadline');
 
--- 6) 동의 기록 3건 (김한우 농장주). 종류는 농가 앱 등록 화면의 3가지. 코드·버전은 제안값
+-- 6) 동의 기록 3건 (김한우 농장주). 종류는 로그인 API(AUTH-01)와 같은 privacy·delivery·outsourcing. 버전은 제안값
 INSERT INTO consents (users_id, consent_type, version, agreed_at)
 SELECT f.owner_user_id, v.consent_type, 'v1', now() - interval '30 days'
 FROM farm_info f, (VALUES ('privacy'), ('delivery'), ('outsourcing')) AS v(consent_type)
@@ -196,6 +196,30 @@ BEGIN
           (CURRENT_DATE + time '09:42') AT TIME ZONE 'Asia/Seoul', 'delivered');
 END $$;
 
+-- 8) 데모 사진: 소 상태 기록 3건(①②④)에 입·몸 옆면 사진 연결 (Object Storage demo/, 출처는 PR에)
+--    ③ 솔밭농장은 출생 신고라 사진 없음
+INSERT INTO field_media (symptom_report_id, kind, requested_part, predicted_part, match, file_path)
+SELECT s.symptom_report_id, 'photo', p.part, p.part, TRUE, p.path
+FROM deliveries d
+JOIN report_summary s ON s.report_summary_id = d.report_summary_id
+CROSS JOIN (VALUES ('mouth', 'demo/photo/mouth.jpg'),
+                   ('flank', 'demo/photo/side.jpg')) AS p(part, path)
+WHERE d.idempotency_key IN ('seed-demo-1', 'seed-demo-2', 'seed-demo-4')
+  AND NOT EXISTS (SELECT 1 FROM field_media m
+                  WHERE m.symptom_report_id = s.symptom_report_id AND m.file_path = p.path);
+
+-- 9) 데모 음성: 오늘 일지(2번 축사 소독 · 1234번 사료 남김)에 연결
+WITH a AS (
+  INSERT INTO field_media (kind, file_path)
+  SELECT 'audio', 'demo/audio/diary_today.m4a'
+  WHERE NOT EXISTS (SELECT 1 FROM field_media WHERE file_path = 'demo/audio/diary_today.m4a')
+  RETURNING media_id
+)
+UPDATE diary_entry e SET audio_media_id = a.media_id
+FROM a, farm_info f
+WHERE f.farm_id = e.farm_id AND f.farm_no = '448012'
+  AND e.date = CURRENT_DATE AND e.raw_text LIKE '아침에 2번 축사 소독했고%';
+
 COMMIT;
 
 -- 확인
@@ -216,3 +240,4 @@ LEFT JOIN cows cw ON cw.cow_id = sr.cow_id
 LEFT JOIN history_report h ON h.history_report_id = d.history_report_id
 LEFT JOIN farm_info fh ON fh.farm_id = h.farm_id
 WHERE d.idempotency_key LIKE 'seed-demo-%' ORDER BY d.deliveries_id DESC;
+SELECT m.media_id, m.kind, m.requested_part, m.file_path FROM field_media m WHERE m.file_path LIKE 'demo/%' ORDER BY m.media_id;
